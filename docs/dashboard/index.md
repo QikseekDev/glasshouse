@@ -21,6 +21,12 @@ For companion applications, see [Glasshouse apps](../apps/tv-app.md), including 
 
 The page works with no internet access, and has a dark/light mode toggle (via the UI or `/?theme=light`).
 
+Use the search field above the panels (or press `/`) to find sections, settings,
+apps and controls. Pin useful destinations with the star beside a result; pinned
+and recently opened destinations appear in the sidebar. These shortcuts and the
+comfortable/compact layout choice are stored in this browser. The Tools tab also
+shows API and MQTT status, recent status changes, and browser feature support.
+
 ## In both themes
 
 ![Metrics tab: SoC temperature, system readouts, storage, watch time, Magic Remote battery and HDMI ports, dark theme (OLED42C24LA)](../screenshots/dashboard.png)

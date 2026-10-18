@@ -898,7 +898,7 @@ button.pill.flash.idle[disabled]:hover{color:var(--w60);border-color:var(--edge)
 /* The Apps tab's groups: a small-caps label over the folded sections, which
    keep their larger titles. A group whose sections this TV has none of goes. */
 .apps-grp+.apps-grp{margin-top:clamp(34px,4.5vw,48px)}
-.apps-grp:not(:has(>details:not([hidden]))){display:none}
+.apps-grp.is-empty{display:none}
 .apps-grp-h{font-weight:500;font-size:13px;letter-spacing:.11em;text-transform:uppercase;color:var(--w80);margin:0 0 6px}
 .apps-grp-d{margin-bottom:6px}
 /* The Advanced tab's settings, side by side in at most two columns where
@@ -1434,3 +1434,29 @@ button.tools-jump:active{background:var(--w80)}
 .home-upload{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:16px 0 8px}
 .home-upload input[type=file]{min-width:0;max-width:100%;flex:1 1 220px}
 .home-wall-empty{aspect-ratio:16/9;display:grid;place-items:center;background:#000;color:#999;border-radius:6px}
+
+/* Cross-panel search and saved shortcuts. Keep the controls native and
+   focusable so keyboards and TV remotes can use the same path. */
+.global-search{position:relative;z-index:40;width:min(520px,100%);margin:14px 0 8px auto}
+.global-search input{width:100%;padding:11px 14px;border:1px solid var(--w25);border-radius:9px;background:var(--w06);color:var(--w100);font:inherit}
+.global-search input:focus{outline:2px solid var(--green);outline-offset:2px}
+.global-search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;max-height:min(60vh,480px);overflow:auto;padding:6px;border:1px solid var(--w25);border-radius:10px;background:var(--bg,var(--w06));box-shadow:0 12px 36px rgba(0,0,0,.35)}
+.search-result{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:0;border-radius:7px;background:transparent;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.search-result:hover,.search-result:focus{background:var(--w12);outline:2px solid var(--green)}
+.search-result span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.search-result small{color:var(--w60)}
+.search-pin{flex:0 0 auto;border:0;background:transparent;color:var(--w60);font-size:18px;cursor:pointer}
+.search-pin.on{color:var(--cand)}
+.nav-shortcuts{display:grid;gap:4px;margin:8px 0}
+.nav-shortcuts:empty{display:none}
+.nav-shortcuts-title{padding:8px 10px 2px;color:var(--w60);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.nav-shortcut{border:0;background:transparent;color:var(--w80);text-align:left;padding:7px 10px;border-radius:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.nav-shortcut:hover,.nav-shortcut:focus{background:var(--w12);color:var(--w100);outline:2px solid var(--green)}
+.panel-load-error{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-left:2px solid var(--red);background:var(--w06);color:var(--w90)}
+.data-freshness{font-size:12px;color:var(--w60);margin:5px 0}
+.data-freshness.stale{color:var(--cand)}
+.compact-ui .panel{padding-top:12px}
+.compact-ui .pv-d{margin-bottom:4px}
+.compat-report{margin:10px 0;padding:12px;border:1px solid var(--edge);border-radius:8px}
+.compat-report li{margin:5px 0}
+@media(max-width:700px){.global-search{width:100%;margin:8px 0}.global-search-results{max-height:50vh}}
