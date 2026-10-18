@@ -14,19 +14,19 @@
 
   // Curated tab aliases to support natural term searches (e.g. 'logs' -> Tools).
   const TAB_ALIASES = {
-    control: ['remote', 'power', 'volume', 'playback', 'inputs', 'hdmi', 'channels', 'panel'],
-    metrics: ['telemetry', 'stats', 'cpu', 'memory', 'ram', 'temp', 'temperature', 'storage', 'hardware'],
-    apps: ['applications', 'installed', 'launch', 'store', 'uninstall'],
-    home: ['homebrew', 'channel', 'takeover', 'wallpapers', 'recent'],
-    privacy: ['telemetry', 'logs', 'tracking', 'activity', 'data', 'privacy policy'],
-    oledcare: ['oled', 'burn-in', 'gsr', 'tpc', 'asbl', 'panel', 'protection', 'orbiting', 'pixel shift', 'logo dimming'],
-    game: ['game optimizer', 'vrr', 'allm', 'fps', 'gaming', 'latency'],
-    screensaver: ['screensavers', 'screen saver', 'screen savers', 'display sleep', 'art', 'clock', 'fireflies', 'fireworks'],
-    advanced: ['settings', 'backlight', 'picture', 'network', 'service', 'developer'],
-    servicemenu: ['service menu', 'instart', 'ezadjust', 'area option'],
-    mqtt: ['home assistant', 'broker', 'automation', 'pubsub'],
-    server: ['version', 'update', 'ota', 'upgrade', 'restart', 'reboot', 'daemon'],
-    tools: ['logs', 'log', 'syslog', 'dmesg', 'kernel', 'glasshouse log', 'terminal', 'diagnostics']
+    control: ['remote', 'remote control', 'magic remote', 'power', 'volume', 'sound', 'audio', 'mute', 'playback', 'media', 'player', 'inputs', 'input', 'source', 'hdmi', 'channels', 'channel', 'panel', 'screen', 'display', 'picture', 'brightness', 'sleep timer', 'timer'],
+    metrics: ['telemetry', 'stats', 'statistics', 'status', 'monitoring', 'monitor', 'cpu', 'processor', 'memory', 'ram', 'temperature', 'temp', 'heat', 'storage', 'disk', 'drive', 'flash', 'health', 'wear', 'uptime', 'watch time', 'battery', 'signal', 'hardware', 'system info', 'firmware'],
+    apps: ['application', 'applications', 'installed apps', 'programs', 'software', 'launch', 'launcher', 'store', 'catalog', 'homebrew apps', 'sideload', 'ipk', 'uninstall'],
+    home: ['homebrew', 'homebrew channel', 'channel', 'home screen', 'home dashboard', 'launcher', 'takeover', 'wallpaper', 'wallpapers', 'background', 'recent', 'favourites', 'favorites'],
+    privacy: ['telemetry', 'logs', 'log', 'tracking', 'activity', 'data', 'privacy policy', 'permissions', 'security', 'personal data'],
+    oledcare: ['oled', 'oled panel', 'oled screen', 'burn-in', 'burn in', 'image retention', 'gsr', 'global stress reduction', 'tpc', 'asbl', 'auto static brightness limiter', 'panel', 'panel care', 'screen care', 'protection', 'protections', 'orbiting', 'pixel orbiting', 'pixel shift', 'logo dimming', 'static logo', 'refresh', 'pixel refresher', 'panel life', 'screen maintenance'],
+    game: ['game optimizer', 'game mode', 'gaming', 'games', 'vrr', 'variable refresh rate', 'allm', 'auto low latency', 'fps', 'frame rate', 'latency', 'input lag', 'console', 'playstation', 'xbox'],
+    screensaver: ['screensavers', 'screen saver', 'screen savers', 'screen protection', 'display sleep', 'sleep screen', 'idle screen', 'idle mode', 'art', 'art gallery', 'clock', 'fireflies', 'fireworks', 'ambient mode'],
+    advanced: ['settings', 'options', 'configuration', 'config', 'preferences', 'power', 'standby', 'quick boot', 'wake on lan', 'wol', 'timers', 'screen time', 'parental controls', 'updates', 'system update', 'display', 'backlight', 'picture', 'network', 'devices', 'sound', 'audio', 'hdmi', 'lights', 'developer'],
+    servicemenu: ['service menu', 'service mode', 'installer menu', 'factory menu', 'hidden menu', 'instart', 'ezadjust', 'ez adjust', 'area option', 'hotel mode'],
+    mqtt: ['home assistant', 'ha', 'smart home', 'broker', 'mqtt broker', 'automation', 'automations', 'pubsub', 'publish', 'subscribe', 'topic', 'integration', 'iot'],
+    server: ['server', 'web server', 'dashboard server', 'version', 'build', 'release', 'update', 'updates', 'ota', 'over the air', 'upgrade', 'restart', 'reboot', 'shutdown', 'daemon', 'service', 'port', 'host', 'address', 'token', 'authentication', 'auth'],
+    tools: ['logs', 'log', 'system logs', 'system log', 'server logs', 'debug log', 'syslog', 'dmesg', 'kernel', 'glasshouse log', 'terminal', 'diagnostics', 'diagnostic', 'troubleshooting', 'maintenance', 'utilities', 'utility']
   };
 
   const TAB_NAMES = {
@@ -43,7 +43,7 @@
       title: 'Global Stress Reduction (GSR)',
       tab: 'oledcare',
       kind: 'setting',
-      aliases: ['gsr', 'burn-in', 'dimming', 'stationary', 'hud', 'global stress reduction'],
+      aliases: ['gsr', 'burn-in', 'burn in', 'image retention', 'dimming', 'static image', 'stationary', 'hud', 'heads up display', 'global stress reduction', 'panel protection'],
       searchText: 'Global Stress Reduction GSR Dims the whole screen when it detects a stationary element',
       selector: '[data-oled="gsr"]',
       fallbackId: 'oled-rows'
@@ -53,7 +53,7 @@
       title: 'Temporal Peak Control (TPC / ASBL)',
       tab: 'oledcare',
       kind: 'setting',
-      aliases: ['tpc', 'asbl', 'burn-in', 'dimming', 'brightness', 'temporal peak control', 'auto static brightness limiter'],
+      aliases: ['tpc', 'asbl', 'abl', 'burn-in', 'burn in', 'dimming', 'brightness', 'peak brightness', 'automatic brightness', 'temporal peak control', 'auto static brightness limiter'],
       searchText: 'Temporal Peak Control TPC ASBL Lowers overall brightness when a bright image is held',
       selector: '[data-oled="tpc"]',
       fallbackId: 'oled-rows'
@@ -63,7 +63,7 @@
       title: 'Screen Shift',
       tab: 'oledcare',
       kind: 'setting',
-      aliases: ['pixel orbiting', 'orbiting', 'burn-in', 'shift', 'screen shift'],
+      aliases: ['pixel orbiting', 'orbiting', 'pixel shift', 'burn-in', 'burn in', 'shift', 'screen shift', 'screen movement'],
       searchText: 'Screen Shift Pixel orbiting Nudges the whole picture by a pixel at a time',
       selector: '[data-oled="screenShift"]',
       fallbackId: 'oled-rows'
@@ -73,7 +73,7 @@
       title: 'Logo Dimming',
       tab: 'oledcare',
       kind: 'setting',
-      aliases: ['logo dimming', 'local dimming', 'burn-in', 'logo'],
+      aliases: ['logo dimming', 'local dimming', 'static logo', 'logo', 'banner', 'burn-in', 'burn in', 'logo protection'],
       searchText: 'Logo Dimming Local dimming Dims only the static logos and banners',
       selector: '[data-oled="logoDimming"]',
       fallbackId: 'oled-rows'
@@ -193,7 +193,7 @@
         title,
         kind: 'tab',
         tab,
-        tabTitle: t('search.tab', 'Tab'),
+        tabTitle: tabLabel(tab),
         searchText: title + ' ' + (TAB_ALIASES[tab] || []).join(' '),
         aliases: TAB_ALIASES[tab] || [],
         target: btn
@@ -339,15 +339,20 @@
       if (el.id === 'btn_ss' || lower.includes('screensaver')) aliases.push('screensaver', 'screensavers', 'screen saver');
       if (el.id === 'btn-reboot' || lower.includes('reboot')) aliases.push('reboot', 'restart', 'reset');
       if (el.id === 'btn-off' || lower.includes('turn off')) aliases.push('power off', 'standby', 'off');
-
-      const tabBadge = groupText ? `${tabLabel(tab)} · ${groupText}` : tabLabel(tab);
+      if (lower.includes('volume') || lower.includes('sound') || lower.includes('mute')) aliases.push('audio', 'speaker', 'loudness', 'quiet');
+      if (lower.includes('screen') || lower.includes('display')) aliases.push('tv', 'monitor', 'panel');
+      if (lower.includes('picture') || lower.includes('image')) aliases.push('video', 'visual', 'calibration');
+      if (lower.includes('input') || lower.includes('source') || lower.includes('hdmi')) aliases.push('connection', 'device', 'console');
+      if (lower.includes('play') || lower.includes('pause') || lower.includes('rewind') || lower.includes('forward')) aliases.push('media', 'player', 'transport');
+      if (lower.includes('sleep') || lower.includes('timer')) aliases.push('idle', 'standby', 'schedule');
+      if (lower.includes('brightness') || lower.includes('energy')) aliases.push('power saving', 'eco', 'dim');
 
       index.push({
         key,
         title,
         kind: 'action',
         tab,
-        tabTitle: tabBadge,
+        tabTitle: tabLabel(tab),
         searchText: title + ' ' + groupText,
         aliases,
         target: el,
@@ -448,6 +453,7 @@
     const section = document.createElement('small');
     section.className = 'search-result-section';
     section.textContent = item.tabTitle;
+    section.setAttribute('aria-label', 'Category: ' + item.tabTitle);
 
     go.appendChild(title);
     go.appendChild(section);

@@ -16,6 +16,11 @@ assert(code.indexOf('function normalizeQuery') !== -1, 'normalizeQuery function 
 assert(code.indexOf('function indexTabs') !== -1, 'indexTabs function defined');
 assert(code.indexOf('function indexSections') !== -1, 'indexSections function defined');
 assert(code.indexOf('function indexControls') !== -1, 'indexControls function defined');
+assert(code.indexOf("section.className = 'search-result-section'") !== -1, 'search results show category labels');
+assert(code.indexOf('tabTitle: tabLabel(tab)') !== -1, 'search results use dashboard tab names as categories');
+assert(code.indexOf("'system logs'") !== -1, 'search includes natural-language log aliases');
+assert(code.indexOf("'variable refresh rate'") !== -1, 'search includes expanded gaming aliases');
+assert(code.indexOf("'home assistant'") !== -1, 'search includes service aliases');
 
 // On legacy Node (0.10/0.12), browser ES6 cannot be evaluated directly
 if (process.version.indexOf('v0.10') === 0 || process.version.indexOf('v0.12') === 0) {
