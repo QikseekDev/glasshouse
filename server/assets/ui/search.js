@@ -57,11 +57,32 @@
   function searchableText(el) {
     return (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
   }
+  function oneEditAway(a, b) {
+    if (Math.abs(a.length - b.length) > 1) return false;
+    let i = 0, j = 0, edits = 0;
+    while (i < a.length && j < b.length) {
+      if (a[i] === b[j]) { i++; j++; continue; }
+      if (++edits > 1) return false;
+      if (a.length > b.length) i++;
+      else if (b.length > a.length) j++;
+      else { i++; j++; }
+    }
+    return edits + (a.length - i) + (b.length - j) <= 1;
+  }
+  function fuzzyMatch(query, text) {
+    return query.split(/\s+/).every(term => {
+      if (term.length < 5) return false;
+      return text.split(/[^a-z0-9]+/).some(word => word && oneEditAway(term, word));
+    });
+  }
   function unavailable(el, tab) {
     const tabButton = document.querySelector(`#tabs [data-tab="${tab}"]`);
-    return tab === 'metrics' || tab === 'apps' ||
-      !tabButton || tabButton.hidden || tabButton.disabled || tabButton.getAttribute('aria-disabled') === 'true' ||
-      el.hidden || el.matches(':disabled') || !!el.querySelector(':disabled');
+    if (tab === 'metrics' || tab === 'apps' || !tabButton || tabButton.hidden || tabButton.disabled ||
+        tabButton.getAttribute('aria-disabled') === 'true' || el.hidden || el.matches(':disabled')) return true;
+    const controls = el.matches('button, input, select, textarea, a') ? [el] :
+      Array.from(el.querySelectorAll('button, input, select, textarea, a'));
+    return controls.length > 0 && controls.every(control =>
+      control.matches(':disabled') || control.getAttribute('aria-disabled') === 'true');
   }
   function buildIndex() {
     const seen = {};
@@ -151,12 +172,18 @@
       else if (title.indexOf(term) === 0) score = 300;
       else if (title.includes(term)) score = 200;
       else if (corpus.includes(term)) score = 100;
+      else if (fuzzyMatch(term, corpus)) score = 50;
       return { item, score, order };
     }).filter(match => match.score).sort((a, b) => b.score - a.score || a.order - b.order)
       .slice(0, 15).map(match => match.item);
+    const count = document.createElement('div');
+    count.className = 'search-result-count';
+    count.setAttribute('role', 'status');
+    count.textContent = matches.length ? t('search.count', '{n} results', { n: matches.length }) : '';
+    results.appendChild(count);
     if (!matches.length) {
       const empty = document.createElement('div'); empty.className = 'tools-term-empty';
-      empty.textContent = t('search.empty', 'No matching settings, sections, apps or controls.'); results.appendChild(empty);
+      empty.textContent = t('search.empty', 'No matches. Try port, brightness, MQTT, or network.'); results.appendChild(empty);
     } else matches.forEach(item => results.appendChild(resultRow(item)));
     results.hidden = false; input.setAttribute('aria-expanded', 'true');
     if (clear) clear.hidden = !term;
@@ -208,8 +235,8 @@
   input.addEventListener('focus', () => { if (input.value.trim()) renderResults(input.value); });
   input.addEventListener('keydown', event => {
     const rows = Array.from(results.querySelectorAll('.search-result'));
-    if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && rows.length) {
-      event.preventDefault(); rows[event.key === 'ArrowDown' ? 0 : rows.length - 1].focus();
+    if ((event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Home' || event.key === 'End') && rows.length) {
+      event.preventDefault(); rows[event.key === 'ArrowDown' || event.key === 'Home' ? 0 : rows.length - 1].focus();
     } else if (event.key === 'Enter') {
       event.preventDefault(); openFirstResult();
     } else if (event.key === 'Escape') closeSearch();
@@ -217,8 +244,10 @@
   results.addEventListener('keydown', event => {
     const rows = Array.from(results.querySelectorAll('.search-result'));
     const i = rows.indexOf(document.activeElement);
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault(); rows[Math.max(0, Math.min(rows.length - 1, i + (event.key === 'ArrowDown' ? 1 : -1)))].focus();
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Home' || event.key === 'End') {
+      event.preventDefault();
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? rows.length - 1 : i + (event.key === 'ArrowDown' ? 1 : -1);
+      rows[Math.max(0, Math.min(rows.length - 1, next))].focus();
     } else if (event.key === 'Escape') { closeSearch(); input.focus(); }
   });
   if (clear) clear.addEventListener('click', clearSearch);

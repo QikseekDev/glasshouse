@@ -1450,6 +1450,7 @@ button.tools-jump:active{background:var(--w80)}
 .global-search-clear{position:absolute;right:1px;top:1px;width:36px;height:calc(100% - 2px);padding:0;border:0;background:transparent;color:var(--w60);font-size:20px;line-height:1;cursor:pointer}
 .global-search-clear:hover,.global-search-clear:focus-visible{color:var(--w100);outline:2px solid var(--w80);outline-offset:-2px}
 .global-search-results{position:relative;top:auto;left:auto;right:auto;max-height:min(60vh,480px);overflow:auto;margin-top:8px;padding:6px;border:1px solid var(--w25);border-radius:2px;background:var(--bg,var(--w06));box-shadow:0 12px 36px rgba(0,0,0,.35)}
+.search-result-count{padding:6px 10px 8px;color:var(--w50);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
 .search-result-row{display:flex;align-items:center;gap:8px}
 .search-result{display:flex;align-items:center;gap:10px;min-width:0;flex:1;padding:10px;border:0;border-radius:2px;background:transparent;color:inherit;text-align:left;font:inherit;cursor:pointer}
 .search-result:hover,.search-result:focus-visible{background:var(--w12);outline:2px solid var(--w80);outline-offset:-2px}
