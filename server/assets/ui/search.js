@@ -64,7 +64,7 @@
       if (row.hidden || row.closest('#global-search') || row.closest('#sidenav') || row.closest('[hidden]:not(.panel)')) return;
       const title = settingTitle(row);
       const tab = tabFor(row);
-      if (!title || !tab) return;
+      if (!title || !tab || tab === 'apps') return;
       const key = (row.id || (tab + ':' + title.toLowerCase())).slice(0, 180);
       const unique = key + ':' + (seen[key] || 0);
       seen[key] = (seen[key] || 0) + 1;
@@ -78,7 +78,7 @@
       const title = textFor(el);
       if (!title || title.length > 80) return;
       const tab = tabFor(el);
-      if (!tab) return;
+      if (!tab || tab === 'apps') return;
       const key = (el.id || (tab + ':' + title.toLowerCase())).slice(0, 180);
       const unique = key + ':' + (seen[key] || 0);
       seen[key] = (seen[key] || 0) + 1;
