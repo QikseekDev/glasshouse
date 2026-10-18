@@ -1448,6 +1448,8 @@ button.tools-jump:active{background:var(--w80)}
 .search-result-section{flex:0 0 auto;color:var(--w60);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
 .search-pin{flex:0 0 auto;border:0;background:transparent;color:var(--w60);font-size:18px;cursor:pointer;border-radius:2px}
 .search-pin:focus-visible{outline:2px solid var(--w80);outline-offset:-2px}
+.search-highlight{outline:2px solid var(--w80);outline-offset:4px;animation:search-highlight 2.4s ease-out}
+@keyframes search-highlight{0%,65%{background:var(--w12)}100%{background:transparent}}
 .search-pin.on{color:var(--cand)}
 .nav-shortcuts{display:grid;gap:4px;margin:8px 0}
 .nav-shortcuts:empty{display:none}
