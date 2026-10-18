@@ -523,7 +523,7 @@
     }
 
     const queryForms = normalizeQuery(raw);
-    queryForms.tokens = raw.split(/\s+/).filter(Boolean).reduce((acc, token) => acc.concat(normalizeQuery(token)), []);
+    queryForms.tokens = raw.split(/\s+/).filter(Boolean).flatMap(normalizeQuery);
     const matches = index.map((item, order) => {
       const score = scoreItem(item, queryForms);
       return { item, score, order };
