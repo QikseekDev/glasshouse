@@ -114,7 +114,7 @@
       section: t('search.kind.section', 'Section'),
       log: t('search.kind.log', 'Log')
     };
-    return labels[kind] || t('search.kind.result', 'Result');
+    return labels[kind] || 'Result';
   }
 
   function searchableText(el) {
