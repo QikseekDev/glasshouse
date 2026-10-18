@@ -165,8 +165,15 @@
       const title = document.createElement('div'); title.className = 'nav-shortcuts-title';
       title.textContent = t('search.pinned', 'Pinned'); host.appendChild(title);
       rows.forEach(item => {
+        const row = document.createElement('div'); row.className = 'nav-shortcut-row';
         const button = document.createElement('button'); button.type = 'button'; button.className = 'nav-shortcut';
-        button.textContent = item.title; button.title = item.title; button.addEventListener('click', () => openItem(item)); host.appendChild(button);
+        button.textContent = item.title; button.title = item.title; button.addEventListener('click', () => openItem(item));
+        const unpin = document.createElement('button');
+        unpin.type = 'button'; unpin.className = 'nav-shortcut-pin on'; unpin.textContent = '★';
+        unpin.title = t('search.unpin', 'Remove shortcut');
+        unpin.setAttribute('aria-label', t('search.unpin', 'Remove shortcut'));
+        unpin.addEventListener('click', event => { event.stopPropagation(); toggleFavorite(item); });
+        row.appendChild(button); row.appendChild(unpin); host.appendChild(row);
       });
     });
   }

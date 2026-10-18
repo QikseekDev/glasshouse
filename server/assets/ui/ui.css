@@ -1463,8 +1463,13 @@ button.tools-jump:active{background:var(--w80)}
 .nav-shortcuts{display:grid;gap:4px;margin:8px 0}
 .nav-shortcuts:empty{display:none}
 .nav-shortcuts-title{padding:8px 10px 2px;color:var(--w60);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.nav-shortcut-row{display:flex;align-items:center;gap:2px}
 .nav-shortcut{border:0;background:transparent;color:var(--w80);text-align:left;padding:7px 10px;border-radius:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.nav-shortcut{flex:1;min-width:0}
 .nav-shortcut:hover,.nav-shortcut:focus-visible{background:var(--w12);color:var(--w100);outline:2px solid var(--w80);outline-offset:-2px}
+.nav-shortcut-pin{flex:0 0 32px;width:32px;height:32px;padding:0;border:0;border-radius:2px;background:transparent;color:var(--cand);font-size:16px;line-height:1;cursor:pointer}
+.nav-shortcut-pin:hover{background:var(--w12);color:var(--w100)}
+.nav-shortcut-pin:focus-visible{outline:2px solid var(--w80);outline-offset:-2px}
 .panel-load-error{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-left:2px solid var(--red);background:var(--w06);color:var(--w90)}
 .data-freshness{font-size:12px;color:var(--w60);margin:5px 0}
 .data-freshness.stale{color:var(--cand)}
