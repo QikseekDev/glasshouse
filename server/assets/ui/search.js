@@ -166,7 +166,6 @@
   }
 
   function tabAvailable(tab) {
-    if (tab === 'metrics' || tab === 'apps') return false;
     const button = document.querySelector(`#tabs [data-tab="${tab}"]`);
     return !!button && !button.hidden && !button.disabled && button.getAttribute('aria-disabled') !== 'true';
   }
@@ -524,7 +523,7 @@
     }
 
     const queryForms = normalizeQuery(raw);
-    queryForms.tokens = raw.split(/\s+/).filter(Boolean).flatMap(normalizeQuery);
+    queryForms.tokens = raw.split(/\s+/).filter(Boolean).reduce((acc, token) => acc.concat(normalizeQuery(token)), []);
     const matches = index.map((item, order) => {
       const score = scoreItem(item, queryForms);
       return { item, score, order };

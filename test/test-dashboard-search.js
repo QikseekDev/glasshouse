@@ -26,6 +26,8 @@ assert(code.indexOf("t('search.category'") !== -1, 'category labels are translat
 assert(aliasesCode.indexOf("'system logs'") !== -1, 'search includes natural-language log aliases');
 assert(aliasesCode.indexOf("'variable refresh rate'") !== -1, 'search includes expanded gaming aliases');
 assert(aliasesCode.indexOf("'home assistant'") !== -1, 'search includes service aliases');
+assert(code.indexOf('.flatMap(') === -1, 'no flatMap usage in search.js (incompatible with webOS 4/5 Chromium)');
+assert(code.indexOf("tab === 'metrics' || tab === 'apps'") === -1, 'metrics and apps tabs are not blocked from search');
 
 // On legacy Node (0.10/0.12), browser ES6 cannot be evaluated directly
 if (process.version.indexOf('v0.10') === 0 || process.version.indexOf('v0.12') === 0) {
