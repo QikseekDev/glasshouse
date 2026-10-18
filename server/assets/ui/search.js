@@ -3,6 +3,7 @@
 (() => {
   const input = q('global-search-input');
   const results = q('global-search-results');
+  const clear = q('global-search-clear');
   if (!input || !results) return;
 
   const FAVORITES_KEY = 'glasshouse_search_favorites';
@@ -10,7 +11,7 @@
   const labels = ['button', 'summary', '[role="button"]', 'select', 'label', 'input[placeholder]', '.col-sec', '.apps-grp-h'];
   const settingRows = ['.prot-row', '.set', '.cfg-f', '.pv-row'];
   let favorites = readList(FAVORITES_KEY);
-  let recents = readList(RECENTS_KEY);
+  let recents = readList(RECENTS_KEY).slice(0, 3);
   let index = [];
   let appsRequested = false;
 
@@ -84,7 +85,7 @@
     });
   }
   function addRecent(item) {
-    recents = [item.key].concat(recents.filter(key => key !== item.key)).slice(0, 6);
+    recents = [item.key].concat(recents.filter(key => key !== item.key)).slice(0, 3);
     saveList(RECENTS_KEY, recents);
     renderShortcuts();
   }
@@ -147,13 +148,24 @@
     buildIndex();
     const term = (query || '').trim().toLowerCase();
     results.textContent = '';
-    if (!term) { results.hidden = true; input.setAttribute('aria-expanded', 'false'); return; }
-    const matches = index.filter(item => item.searchText.toLowerCase().includes(term)).slice(0, 15);
+    if (!term) { results.hidden = true; input.setAttribute('aria-expanded', 'false'); if (clear) clear.hidden = true; return; }
+    const matches = index.map((item, order) => {
+      const title = item.title.toLowerCase();
+      const corpus = item.searchText.toLowerCase();
+      let score = 0;
+      if (title === term) score = 400;
+      else if (title.indexOf(term) === 0) score = 300;
+      else if (title.includes(term)) score = 200;
+      else if (corpus.includes(term)) score = 100;
+      return { item, score, order };
+    }).filter(match => match.score).sort((a, b) => b.score - a.score || a.order - b.order)
+      .slice(0, 15).map(match => match.item);
     if (!matches.length) {
       const empty = document.createElement('div'); empty.className = 'tools-term-empty';
       empty.textContent = t('search.empty', 'No matching settings, sections, apps or controls.'); results.appendChild(empty);
     } else matches.forEach(item => results.appendChild(resultRow(item)));
     results.hidden = false; input.setAttribute('aria-expanded', 'true');
+    if (clear) clear.hidden = !term;
   }
   function renderShortcuts() {
     const host = q('nav-shortcuts');
@@ -171,12 +183,23 @@
     });
   }
   function closeSearch() { results.hidden = true; input.setAttribute('aria-expanded', 'false'); }
+  function openFirstResult() {
+    const first = results.querySelector('.search-result');
+    if (first) first.click();
+  }
+  function clearSearch() {
+    input.value = '';
+    renderResults('');
+    input.focus();
+  }
   input.addEventListener('input', () => renderResults(input.value));
   input.addEventListener('focus', () => { if (input.value.trim()) renderResults(input.value); });
   input.addEventListener('keydown', event => {
     const rows = Array.from(results.querySelectorAll('.search-result'));
     if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && rows.length) {
       event.preventDefault(); rows[event.key === 'ArrowDown' ? 0 : rows.length - 1].focus();
+    } else if (event.key === 'Enter') {
+      event.preventDefault(); openFirstResult();
     } else if (event.key === 'Escape') closeSearch();
   });
   results.addEventListener('keydown', event => {
@@ -187,6 +210,7 @@
     } else if (event.key === 'Escape') { closeSearch(); input.focus(); }
   });
   document.addEventListener('click', event => { if (!event.target.closest('#global-search')) closeSearch(); });
+  if (clear) clear.addEventListener('click', clearSearch);
   document.addEventListener('keydown', event => {
     if ((event.key === '/' || (event.key.toLowerCase() === 'k' && (event.ctrlKey || event.metaKey))) &&
         !/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) && !event.target.isContentEditable) {
