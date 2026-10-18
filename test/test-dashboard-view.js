@@ -184,4 +184,5 @@ vm.runInNewContext(scriptMatch[1] + '\n;' + testPagingSnippet, sandbox);
   console.log('  ✓ updateRows includes Server health row');
 })();
 
+require('./dashboard-enhancements.check.js');
 console.log('ALL test-dashboard-view.js assertions passed!\n');

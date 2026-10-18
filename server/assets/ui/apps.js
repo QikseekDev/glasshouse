@@ -16,15 +16,58 @@ async function loadApps() {
     const r = await fetch(api('/api/apps'), { cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
-    if (d && d.ok) {
-      appsData = d;
-      renderAppsPanel();
-    }
+    if (!d || !d.ok) throw new Error((d && d.error) || 'Could not load installed apps.');
+    appsData = d;
+    renderAppsPanel();
+    updateAppsGroups();
   } catch (e) {
     console.error('loadApps failed:', e);
+    const list = q('apps-installed-list');
+    if (list) list.innerHTML = `<div class="panel-load-error" role="alert"><span>${esc(e.message || 'Could not load installed apps.')}</span><button type="button" class="pill idle" onclick="loadApps()">Retry</button></div>`;
   } finally {
     appsLoading = false;
   }
+}
+
+// Do not depend on CSS :has(): webOS 6 ships Chromium 79, which predates it.
+function updateAppsGroups() {
+  document.querySelectorAll('.apps-grp').forEach(group => {
+    const sections = Array.from(group.querySelectorAll('details')).filter(section => section.parentNode === group);
+    group.classList.toggle('is-empty', sections.length > 0 && sections.every(section => section.hidden));
+  });
+}
+
+document.addEventListener('change', updateAppsGroups);
+
+function renderInstalledApps() {
+  if (!appsData) return;
+  const list = q('apps-installed-list');
+  if (!list) return;
+  const installed = appsData.installed || [];
+  const query = (q('installed-app-search') ? q('installed-app-search').value : '').trim().toLowerCase();
+  const shown = installed.filter(app => !query || [app.title, app.id, app.vendor].join(' ').toLowerCase().includes(query));
+  if (!installed.length) {
+    list.innerHTML = `<div class="sub" style="padding:16px 0">${esc(t('apps.installed.none', 'No removable apps found on the TV.'))}</div>`;
+    return;
+  }
+  if (!shown.length) {
+    list.innerHTML = `<div class="sub" style="padding:16px 0">${esc(t('apps.installed.noMatch', 'No installed apps match “{query}”.', { query }))}</div>`;
+    return;
+  }
+  list.innerHTML = shown.map(app => {
+    const title = esc(app.title || app.id);
+    const iconUrl = api('/api/apps/icon?id=' + encodeURIComponent(app.id));
+    const meta = [app.version ? 'v' + app.version : '', app.vendor || ''].filter(Boolean).join(' · ');
+    const sizeBadge = (app.size && typeof fmtSize === 'function') ? fmtSize(app.size) : '';
+    return `<div class="prot-row">
+      <img src="${esc(iconUrl)}" width="38" height="38" style="border-radius:8px;object-fit:contain;background:var(--w06);flex-shrink:0" onerror="this.style.display='none'">
+      <div class="prot-main"><div class="prot-title">${title}</div><div class="prot-desc">${esc(meta || t('apps.installed.app', 'Installed app'))}</div>${rowErrorNote(app.id)}</div>
+      <div class="prot-status">
+        ${sizeBadge ? `<span class="app-badge" title="${esc(t('apps.installed.storageTooltip', 'Storage footprint'))}">${esc(sizeBadge)}</span>` : ''}
+        <button type="button" class="pill good" onclick="sendCommand('launchApp','${jsq(app.id)}')" ${!appsData.writable || uninstalling[app.id] ? 'disabled' : ''}>${esc(t('apps.launch.button', 'Launch'))}</button>
+        <button type="button" class="pill ${uninstalling[app.id] ? 'busy' : 'bad'}" onclick="confirmUninstall('${jsq(app.id)}', '${jsq(app.title || app.id)}')" ${!appsData.writable || uninstalling[app.id] ? 'disabled' : ''}>${esc(uninstalling[app.id] ? t('apps.uninstall.working', 'Uninstalling…') : t('apps.uninstall.button', 'Uninstall'))}</button>
+      </div></div>`;
+  }).join('');
 }
 
 // The address without its scheme, as a reminder of which page a tile opens.
@@ -149,32 +192,7 @@ function renderAppsPanel() {
   const appCount = n => n === 1 ? t('apps.count.one', '1 app') : t('apps.count', '{n} apps', { n });
   if (instSummary) instSummary.textContent = appCount(installed.length);
 
-  if (instList) {
-    if (installed.length === 0) {
-      instList.innerHTML = `<div class="sub" style="padding:16px 0">${esc(t('apps.installed.none', 'No removable apps found on the TV.'))}</div>`;
-    } else {
-      instList.innerHTML = installed.map(app => {
-        const title = esc(app.title || app.id);
-        const id = esc(app.id);
-        const iconUrl = api('/api/apps/icon?id=' + encodeURIComponent(app.id));
-        const meta = [app.version ? 'v' + app.version : '', app.vendor || ''].filter(Boolean).join(' · ');
-        const sizeBadge = (app.size && typeof fmtSize === 'function') ? fmtSize(app.size) : '';
-        return `<div class="prot-row">
-          <img src="${iconUrl}" width="38" height="38" style="border-radius:8px;object-fit:contain;background:var(--w06);flex-shrink:0" onerror="this.style.display='none'">
-          <div class="prot-main">
-            <div class="prot-title">${title}</div>
-            <div class="prot-desc">${esc(meta || t('apps.installed.app', 'Installed app'))}</div>
-            ${rowErrorNote(app.id)}
-          </div>
-          <div class="prot-status">
-            ${sizeBadge ? `<span class="app-badge" title="${esc(t('apps.installed.storageTooltip', 'Storage footprint'))}">${esc(sizeBadge)}</span>` : ''}
-            <button type="button" class="pill good" onclick="sendCommand('launchApp','${jsq(app.id)}')" ${!d.writable || uninstalling[app.id] ? 'disabled' : ''}>${esc(t('apps.launch.button', 'Launch'))}</button>
-            <button type="button" class="pill ${uninstalling[app.id] ? 'busy' : 'bad'}" onclick="confirmUninstall('${jsq(app.id)}', '${jsq(app.title || app.id)}')" ${!d.writable || uninstalling[app.id] ? 'disabled' : ''}>${esc(uninstalling[app.id] ? t('apps.uninstall.working', 'Uninstalling\u2026') : t('apps.uninstall.button', 'Uninstall'))}</button>
-          </div>
-        </div>`;
-      }).join('');
-    }
-  }
+  if (instList) renderInstalledApps();
 
   renderSavedPages(d);
 

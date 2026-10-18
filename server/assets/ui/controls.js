@@ -192,6 +192,7 @@ async function sendCommand(action, value) {
       setTimeout(tick, 0);
     } else {
       clearErr();
+      if (window.recordDashboardRecent) window.recordDashboardRecent(triggerBtn);
     }
     setTimeout(tick, 320);
     return j;

@@ -24,8 +24,15 @@
     <div class="stream-info">
       <div class="stream-primary num" id="stream-primary">&mdash;</div>
     </div>
+    <div class="data-freshness" id="data-freshness" role="status" data-t="common.freshness.waiting">Waiting for TV data</div>
   </div>
 </header>
+
+<div class="global-search" id="global-search">
+  <label class="sr-only" for="global-search-input" data-t="search.label">Search settings, sections, apps and controls</label>
+  <input id="global-search-input" type="search" autocomplete="off" placeholder="Search settings, sections, apps and controls" data-t-placeholder="search.label" aria-controls="global-search-results" aria-expanded="false">
+  <div id="global-search-results" class="global-search-results" role="region" aria-label="Search results" data-t-aria-label="search.results" hidden></div>
+</div>
 
 <div id="offline" role="status" hidden><span id="offline-msg"><b data-t="offline.title">Can’t reach the TV.</b> <span data-t="offline.body">It may be switched off or in standby. This page reconnects by itself when the TV is back.</span></span><span id="err" role="alert" style="display:none"></span></div>
 
@@ -84,6 +91,12 @@
       </summary>
       <div class="nav-pref-body">
         <div class="nav-pref-grp">
+          <div class="nav-pref-lbl" data-t="nav.layout">Layout</div>
+          <div class="theme-seg" role="group" aria-label="Dashboard density" data-t-aria-label="nav.density">
+            <button type="button" data-density-set="comfortable" aria-pressed="true" data-t="nav.comfortable">Comfort</button><button type="button" data-density-set="compact" aria-pressed="false" data-t="nav.compact">Compact</button>
+          </div>
+        </div>
+        <div class="nav-pref-grp">
           <div class="nav-pref-lbl" data-t="server.theme.title">Theme</div>
           <div class="theme-seg" role="group" aria-label="Theme" data-t-aria-label="theme">
             <button type="button" data-theme-set="auto" data-t="theme.auto">Auto</button><button type="button"
@@ -108,6 +121,7 @@
         </div>
       </div>
     </details>
+    <div class="nav-shortcuts" id="nav-shortcuts" aria-live="polite"></div>
     <a class="nav-help" id="nav-help" href="https://rorygallagher2024.github.io/glasshouse/dashboard/" target="_blank" rel="noopener">
       <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.9.6c0 1.7-2.5 2.2-2.5 3.8M12 17h.01"/></svg>
       <span data-t="nav.help">Help</span>
@@ -751,6 +765,8 @@
     <details class="pv-d" id="disc-installed-apps">
       <summary><span data-t="apps.manage">Manage applications</span> <span class="cur" id="apps-installed-summary"></span></summary>
       <div class="pv-sub" data-t="apps.manage.desc">Store downloads and user-installed applications. Launch opens the application on the TV, or click Uninstall to permanently remove it and free up internal eMMC flash storage space.</div>
+      <label class="sr-only" for="installed-app-search" data-t="apps.installed.filter">Filter installed apps</label>
+      <input type="search" id="installed-app-search" class="home-ch-filter" placeholder="Filter installed apps" data-t-placeholder="apps.installed.filter" autocomplete="off" oninput="renderInstalledApps()">
       <div class="prot-table" id="apps-installed-list">
         <div class="sub" style="padding:16px 0" data-t="apps.loadingInstalled">Loading installed apps&hellip;</div>
       </div>
@@ -1454,6 +1470,13 @@
 <section class="panel" id="toolspane" role="tabpanel" hidden>
   <div class="pv-sec" data-t="tools.title">System logs</div>
   <div class="pv-sub" data-t="tools.desc">Logs from the TV, Glasshouse and the TV's hardware, for troubleshooting.</div>
+  <div class="compat-report" id="diagnostics-card">
+    <div class="grp" data-t="tools.health.title">Service health and browser capabilities</div>
+    <div id="diagnostics-health" role="status" data-t="tools.health.waiting">Status has not been checked.</div>
+    <ul id="diagnostics-capabilities"></ul>
+    <div id="diagnostics-history" class="pv-sub"></div>
+    <div class="btns"><button type="button" class="pill idle" onclick="loadDiagnostics()" data-t="tools.health.refresh">Refresh status</button><button type="button" class="pill idle" onclick="recoverDashboard()" data-t="tools.health.recover">Refresh dashboard data</button></div>
+  </div>
   <div class="pv-sub" id="tools-fwd" hidden></div>
 
   <div class="tools-toolbar">
@@ -1574,12 +1597,13 @@
 <script src="/assets/ui/apps.js"></script>
 <script src="/assets/ui/install.js"></script>
 <script src="/assets/ui/home.js"></script>
-<script src="/assets/ui/tabs.js"></script>
 <script src="/assets/ui/servicemenu.js"></script>
 <script src="/assets/ui/oled.js"></script>
 <script src="/assets/ui/screensavers.js"></script>
 <script src="/assets/ui/mqtt.js"></script>
 <script src="/assets/ui/tools.js"></script>
+<script src="/assets/ui/search.js"></script>
+<script src="/assets/ui/tabs.js"></script>
 <script src="/assets/ui/main.js"></script>
 </body>
 </html>
