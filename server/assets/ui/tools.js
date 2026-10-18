@@ -21,100 +21,6 @@ let toolsMeta = null;
 // for the sources and line limit it was read with.
 let toolsCursor = '';
 let toolsCursorKey = '';
-let diagnosticsTimer = null;
-let lastHealthSignature = '';
-
-function scheduleDiagnosticsPoll() {
-  if (diagnosticsTimer) clearTimeout(diagnosticsTimer);
-  diagnosticsTimer = null;
-  if (activeTab !== 'tools' || document.hidden) return;
-  diagnosticsTimer = setTimeout(async () => {
-    await loadDiagnostics(true);
-    scheduleDiagnosticsPoll();
-  }, 15000);
-}
-
-function browserCapabilities() {
-  let hasSelector = false, colorMix = false;
-  try {
-    hasSelector = !!(window.CSS && CSS.supports && CSS.supports('selector(:has(*))'));
-    colorMix = !!(window.CSS && CSS.supports && CSS.supports('color', 'color-mix(in srgb, black, white)'));
-  } catch (e) { /* older CSS.supports implementations */ }
-  return [
-    [t('tools.health.fetch', 'Fetch API'), typeof window.fetch === 'function'],
-    [t('tools.health.abort', 'AbortController'), typeof window.AbortController === 'function'],
-    [t('tools.health.has', 'CSS :has()'), hasSelector],
-    [t('tools.health.colorMix', 'CSS color-mix()'), colorMix]
-  ];
-}
-
-function renderCapabilities() {
-  const list = q('diagnostics-capabilities');
-  if (!list) return;
-  list.textContent = '';
-  browserCapabilities().forEach(([name, supported]) => {
-    const row = document.createElement('li');
-    row.textContent = t('tools.health.capability', '{name}: {status}', { name, status: supported ? t('common.available', 'available') : t('tools.health.fallback', 'not available (fallback needed)') });
-    list.appendChild(row);
-  });
-  const ua = document.createElement('li');
-  ua.textContent = t('tools.health.browser', 'Browser: {userAgent}', { userAgent: navigator.userAgent || 'unknown' });
-  list.appendChild(ua);
-}
-
-function renderHealthHistory() {
-  const host = q('diagnostics-history');
-  if (!host) return;
-  let rows = [];
-  try { rows = JSON.parse(localStorage.getItem('glasshouse_health_history') || '[]'); } catch (e) { rows = []; }
-  host.textContent = rows.length ? t('tools.health.history', 'Recent service changes: {items}', { items: rows.map(row => row.time + ' ' + row.state).join(' · ') }) : t('tools.health.historyEmpty', 'No service state changes recorded in this browser yet.');
-}
-
-async function loadDiagnostics(silent) {
-  renderCapabilities();
-  const host = q('diagnostics-health');
-  if (!host) return;
-  try {
-    const pair = await Promise.all([
-      fetch(api('/api/caps'), { cache: 'no-store' }).then(r => { if (!r.ok) throw new Error('API HTTP ' + r.status); return r.json(); }),
-      fetch(api('/api/settings'), { cache: 'no-store' }).then(r => { if (!r.ok) throw new Error('Settings HTTP ' + r.status); return r.json(); })
-    ]);
-    const settings = pair[1] || {};
-    const mqtt = settings.status || {};
-    const signature = (pair[0].version || 'server') + '|' + (mqtt.state || 'unknown');
-    if (signature !== lastHealthSignature) {
-      let rows = [];
-      try { rows = JSON.parse(localStorage.getItem('glasshouse_health_history') || '[]'); } catch (e) { rows = []; }
-      rows.unshift({ time: new Date().toLocaleTimeString(), state: t('tools.health.apiMqtt', 'API reachable; MQTT {state}', { state: mqtt.state || 'unknown' }) });
-      try { localStorage.setItem('glasshouse_health_history', JSON.stringify(rows.slice(0, 8))); } catch (e) { /* storage may be disabled */ }
-      lastHealthSignature = signature;
-    }
-    const latency = mqtt.latencyMs == null ? '' : ' · ' + mqtt.latencyMs + ' ms';
-    host.textContent = t('tools.health.summary', 'Glasshouse API: reachable · Version {version} · MQTT: {state}{latency}', { version: pair[0].version || 'unknown', state: mqtt.state || 'unknown', latency });
-    host.classList.toggle('text-err', mqtt.state === 'error');
-    host.classList.toggle('text-good', mqtt.state === 'connected');
-    renderHealthHistory();
-  } catch (e) {
-    host.textContent = t('tools.health.failed', 'Could not read service status: {error}. Check that the TV is online, then refresh status.', { error: e.message || t('common.requestFailed', 'request failed') });
-    host.classList.add('text-err');
-    if (lastHealthSignature !== 'offline') {
-      let rows = [];
-      try { rows = JSON.parse(localStorage.getItem('glasshouse_health_history') || '[]'); } catch (ignored) { rows = []; }
-      rows.unshift({ time: new Date().toLocaleTimeString(), state: t('tools.health.apiOffline', 'Glasshouse API unavailable') });
-      try { localStorage.setItem('glasshouse_health_history', JSON.stringify(rows.slice(0, 8))); } catch (ignored) { /* storage may be disabled */ }
-      lastHealthSignature = 'offline';
-    }
-    renderHealthHistory();
-  }
-}
-
-function recoverDashboard() {
-  if (typeof tick === 'function') tick();
-  if (typeof loadSettings === 'function') loadSettings(true);
-  if (typeof loadApps === 'function') loadApps();
-  loadLogs(false);
-  loadDiagnostics(true);
-}
 
 function redactToolsText(str) {
   if (!str) return str;
@@ -614,17 +520,9 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     if (toolsPollTimer) clearTimeout(toolsPollTimer);
     toolsPollTimer = null;
-    if (diagnosticsTimer) clearTimeout(diagnosticsTimer);
-    diagnosticsTimer = null;
-  } else {
-    if (activeTab === 'tools' && toolsLive) {
-      loadLogs(true);
-      scheduleToolsPoll();
-    }
-    if (activeTab === 'tools') {
-      loadDiagnostics(true);
-      scheduleDiagnosticsPoll();
-    }
+  } else if (activeTab === 'tools' && toolsLive) {
+    loadLogs(true);
+    scheduleToolsPoll();
   }
 });
 

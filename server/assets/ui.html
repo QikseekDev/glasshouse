@@ -24,7 +24,6 @@
     <div class="stream-info">
       <div class="stream-primary num" id="stream-primary">&mdash;</div>
     </div>
-    <div class="data-freshness" id="data-freshness" role="status" data-t="common.freshness.waiting">Waiting for TV data</div>
   </div>
 </header>
 
@@ -768,8 +767,6 @@
     <details class="pv-d" id="disc-installed-apps">
       <summary><span data-t="apps.manage">Manage applications</span> <span class="cur" id="apps-installed-summary"></span></summary>
       <div class="pv-sub" data-t="apps.manage.desc">Store downloads and user-installed applications. Launch opens the application on the TV, or click Uninstall to permanently remove it and free up internal eMMC flash storage space.</div>
-      <label class="sr-only" for="installed-app-search" data-t="apps.installed.filter">Filter installed apps</label>
-      <input type="search" id="installed-app-search" class="home-ch-filter" placeholder="Filter installed apps" data-t-placeholder="apps.installed.filter" autocomplete="off" oninput="renderInstalledApps()">
       <div class="prot-table" id="apps-installed-list">
         <div class="sub" style="padding:16px 0" data-t="apps.loadingInstalled">Loading installed apps&hellip;</div>
       </div>
@@ -1493,13 +1490,6 @@
 <section class="panel" id="toolspane" role="tabpanel" hidden>
   <div class="pv-sec" data-t="tools.title">System logs</div>
   <div class="pv-sub" data-t="tools.desc">Logs from the TV, Glasshouse and the TV's hardware, for troubleshooting.</div>
-  <div class="compat-report" id="diagnostics-card">
-    <div class="grp" data-t="tools.health.title">Service health and browser capabilities</div>
-    <div id="diagnostics-health" role="status" data-t="tools.health.waiting">Status has not been checked.</div>
-    <ul id="diagnostics-capabilities"></ul>
-    <div id="diagnostics-history" class="pv-sub"></div>
-    <div class="btns"><button type="button" class="pill idle" onclick="loadDiagnostics()" data-t="tools.health.refresh">Refresh status</button><button type="button" class="pill idle" onclick="recoverDashboard()" data-t="tools.health.recover">Refresh dashboard data</button></div>
-  </div>
   <div class="pv-sub" id="tools-fwd" hidden></div>
 
   <div class="tools-toolbar">

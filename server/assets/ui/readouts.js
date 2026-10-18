@@ -49,13 +49,6 @@ q('readouts').innerHTML = ROWS.map(r =>
    </div>`;
 
 let hist = [], lastOk = 0, muted = false, installedApps = [], lastAppId = '';
-function updateFreshness() {
-  const el = q('data-freshness');
-  if (!el) return;
-  const age = lastOk ? Math.max(0, Math.floor((Date.now() - lastOk) / 1000)) : null;
-  el.textContent = age === null ? t('common.freshness.waiting', 'Waiting for TV data') : age <= 4 ? t('common.freshness.now', 'TV data updated just now') : age <= 60 ? t('common.freshness.seconds', 'Last TV update {age}s ago', { age }) : t('common.freshness.minutes', 'TV data is stale ({age}m old)', { age: Math.floor(age / 60) });
-  el.classList.toggle('stale', age !== null && age > 6);
-}
 
 const POPULAR_APPS = [
   'youtube.leanback.v4', 'netflix', 'amazon', 'com.apple.appletv',
@@ -236,7 +229,6 @@ async function tick() {
     }
     const firstData = !lastOk;
     lastOk = Date.now();
-    updateFreshness();
 
     const hk = hdmiKey(d);
     if (lastHdmiKey !== null && hk !== lastHdmiKey && hdmiLoaded) loadHdmi();
@@ -723,7 +715,6 @@ async function tick() {
     // so the columns are only worth filling once that has happened.
     if (firstData) relayout(true);
   } catch (e) {
-    updateFreshness();
     if (updRestarting) return;
     q('panels').classList.add('stale');
     if (Date.now() - lastOk <= 6000) return;
