@@ -7,7 +7,7 @@
 
   const FAVORITES_KEY = 'glasshouse_search_favorites';
   const RECENTS_KEY = 'glasshouse_search_recents';
-  const labels = ['button', 'summary', '[role="button"]', '.lbl', '.grp', '.col-sec', '.apps-grp-h', 'label', 'input[placeholder]'];
+  const labels = ['button', 'summary', '[role="button"]', 'select', 'input[placeholder]', '.col-sec', '.apps-grp-h'];
   let favorites = readList(FAVORITES_KEY);
   let recents = readList(RECENTS_KEY);
   let index = [];
@@ -36,7 +36,14 @@
   }
   function textFor(el) {
     if (el.matches('input[placeholder]')) return el.getAttribute('aria-label') || el.placeholder;
-    return (el.getAttribute('aria-label') || el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
+    const labelled = el.getAttribute('aria-label') || el.getAttribute('title');
+    if (labelled) return labelled.replace(/\s+/g, ' ').trim();
+    return Array.from(el.childNodes).filter(node => node.nodeType === 3)
+      .map(node => node.nodeValue).join(' ').replace(/\s+/g, ' ').trim();
+  }
+  function tabLabel(tab) {
+    const button = document.querySelector(`#tabs [data-tab="${tab}"]`);
+    return button ? textFor(button) : tab;
   }
   function buildIndex() {
     const seen = {};
@@ -46,13 +53,13 @@
       const panel = el.closest('.panel');
       if (!panel || el.closest('[hidden]:not(.panel)')) return;
       const title = textFor(el);
-      if (!title || title.length > 120) return;
+      if (!title || title.length > 80) return;
       const tab = tabFor(el);
       if (!tab) return;
       const key = (el.id || (tab + ':' + title.toLowerCase())).slice(0, 180);
       const unique = key + ':' + (seen[key] || 0);
       seen[key] = (seen[key] || 0) + 1;
-      index.push({ key: unique, title, tab, target: el, detail: el.closest('details') });
+      index.push({ key: unique, title, tab, tabTitle: tabLabel(tab), target: el, detail: el.closest('details') });
     });
   }
   function addRecent(item) {
@@ -87,10 +94,15 @@
   }
   function resultRow(item) {
     const row = document.createElement('div');
-    row.className = 'search-result';
+    row.className = 'search-result-row';
     row.setAttribute('role', 'group');
     const go = document.createElement('button');
-    go.type = 'button'; go.className = 'search-result'; go.textContent = item.title;
+    go.type = 'button'; go.className = 'search-result';
+    const title = document.createElement('span');
+    title.className = 'search-result-title'; title.textContent = item.title;
+    const section = document.createElement('small');
+    section.className = 'search-result-section'; section.textContent = item.tabTitle;
+    go.appendChild(title); go.appendChild(section);
     go.addEventListener('click', () => openItem(item));
     const pin = document.createElement('button');
     pin.type = 'button'; pin.className = 'search-pin' + (favorites.includes(item.key) ? ' on' : '');
@@ -136,13 +148,13 @@
   input.addEventListener('input', () => renderResults(input.value));
   input.addEventListener('focus', () => { if (input.value.trim()) renderResults(input.value); });
   input.addEventListener('keydown', event => {
-    const rows = Array.from(results.querySelectorAll('.search-result > button'));
+    const rows = Array.from(results.querySelectorAll('.search-result'));
     if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && rows.length) {
       event.preventDefault(); rows[event.key === 'ArrowDown' ? 0 : rows.length - 1].focus();
     } else if (event.key === 'Escape') closeSearch();
   });
   results.addEventListener('keydown', event => {
-    const rows = Array.from(results.querySelectorAll('.search-result > button'));
+    const rows = Array.from(results.querySelectorAll('.search-result'));
     const i = rows.indexOf(document.activeElement);
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault(); rows[Math.max(0, Math.min(rows.length - 1, i + (event.key === 'ArrowDown' ? 1 : -1)))].focus();

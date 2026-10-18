@@ -66,6 +66,8 @@
   });
 })();
 
+// End of theme initialization.
+// Language and theme settings are applied above.
 // ---- language (auto / a language) ----
 (function initLanguage() {
   const chosen = I18N.stored();
@@ -84,28 +86,5 @@
     const url = new URL(location.href);
     url.searchParams.delete('lang');
     location.replace(url.toString());
-  });
-})();
-
-// A local presentation preference only: it never writes TV configuration.
-(function initDensity() {
-  let density = 'comfortable';
-  try { density = localStorage.getItem('density') || density; } catch (e) { /* private window */ }
-  if (density !== 'compact') density = 'comfortable';
-  function apply() {
-    document.documentElement.classList.toggle('compact-ui', density === 'compact');
-    document.querySelectorAll('[data-density-set]').forEach(button => {
-      const on = button.dataset.densitySet === density;
-      button.classList.toggle('on', on);
-      button.setAttribute('aria-pressed', String(on));
-    });
-  }
-  apply();
-  document.addEventListener('click', event => {
-    const button = event.target.closest('[data-density-set]');
-    if (!button) return;
-    density = button.dataset.densitySet === 'compact' ? 'compact' : 'comfortable';
-    try { localStorage.setItem('density', density); } catch (e) { /* private window */ }
-    apply();
   });
 })();
