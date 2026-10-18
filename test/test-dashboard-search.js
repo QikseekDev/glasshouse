@@ -9,6 +9,7 @@ var path = require('path');
 console.log('Running test-dashboard-search.js ...');
 
 var code = fs.readFileSync(path.join(__dirname, '../server/assets/ui/search.js'), 'utf8');
+var aliasesCode = fs.readFileSync(path.join(__dirname, '../server/assets/ui/search-aliases.js'), 'utf8');
 
 // Basic syntax check
 assert(code.indexOf('function scoreItem') !== -1, 'scoreItem function defined');
@@ -18,9 +19,10 @@ assert(code.indexOf('function indexSections') !== -1, 'indexSections function de
 assert(code.indexOf('function indexControls') !== -1, 'indexControls function defined');
 assert(code.indexOf("section.className = 'search-result-section'") !== -1, 'search results show category labels');
 assert(code.indexOf('tabTitle: tabLabel(tab)') !== -1, 'search results use dashboard tab names as categories');
-assert(code.indexOf("'system logs'") !== -1, 'search includes natural-language log aliases');
-assert(code.indexOf("'variable refresh rate'") !== -1, 'search includes expanded gaming aliases');
-assert(code.indexOf("'home assistant'") !== -1, 'search includes service aliases');
+assert(code.indexOf("t('search.category'") !== -1, 'category labels are translated');
+assert(aliasesCode.indexOf("'system logs'") !== -1, 'search includes natural-language log aliases');
+assert(aliasesCode.indexOf("'variable refresh rate'") !== -1, 'search includes expanded gaming aliases');
+assert(aliasesCode.indexOf("'home assistant'") !== -1, 'search includes service aliases');
 
 // On legacy Node (0.10/0.12), browser ES6 cannot be evaluated directly
 if (process.version.indexOf('v0.10') === 0 || process.version.indexOf('v0.12') === 0) {
@@ -115,6 +117,11 @@ var toolsScore = sandbox.scoreItem(toolsTab, logsForms);
 var logsSecScore = sandbox.scoreItem(systemLogsSec, logsForms);
 assert(toolsScore >= 450, 'logs query matches Tools tab alias');
 assert(logsSecScore >= 300, 'logs query matches System logs heading');
+
+// Test multi-word searches match meaningful words, not only exact phrases
+var multiWord = sandbox.normalizeQuery('system log');
+multiWord.tokens = ['system', 'log'];
+assert(sandbox.scoreItem(systemLogsSec, multiWord) > 0, 'system log matches by individual words');
 
 // Test screensaver search
 var ssForms = sandbox.normalizeQuery('screensaver');

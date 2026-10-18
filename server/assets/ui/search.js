@@ -366,33 +366,38 @@
     const aliases = item.aliases || [];
     let best = 0;
 
+    function scoreTerm(q) {
+      if (title === q) return 500;
+      if (aliases.includes(q)) return 450;
+      if (title.startsWith(q)) return 350;
+      if (new RegExp('\\b' + escapeRegExp(q)).test(title)) return 300;
+      if (title.includes(q)) return 200;
+      if (aliases.some(a => a.includes(q) || q.includes(a))) return 150;
+      if (corpus.includes(q)) return 100;
+      if (q.length >= 5 && fuzzyMatch(q, corpus)) return 50;
+      return 0;
+    }
+
     for (let i = 0; i < queryForms.length; i++) {
       const q = queryForms[i];
       const penalty = i * 15;
-      let score = 0;
-
-      if (title === q) {
-        score = 500;
-      } else if (aliases.includes(q)) {
-        score = 450;
-      } else if (title.startsWith(q)) {
-        score = 350;
-      } else if (new RegExp('\\b' + escapeRegExp(q)).test(title)) {
-        score = 300;
-      } else if (title.includes(q)) {
-        score = 200;
-      } else if (aliases.some(a => a.includes(q) || q.includes(a))) {
-        score = 150;
-      } else if (corpus.includes(q)) {
-        score = 100;
-      } else if (q.length >= 5 && fuzzyMatch(q, corpus)) {
-        score = 50;
-      }
+      let score = scoreTerm(q);
 
       if (score > 0) {
         if (item.kind === 'tab' && score >= 300) score += 20;
         score -= penalty;
         if (score > best) best = score;
+      }
+    }
+
+    // A phrase match wins above, but also allow natural searches such as
+    // "oled panel" or "system log settings" to match each meaningful word.
+    const tokens = queryForms.tokens || [];
+    if (tokens.length > 1) {
+      const tokenScores = tokens.map(scoreTerm);
+      if (tokenScores.every(score => score > 0)) {
+        const combined = tokenScores.reduce((sum, score) => sum + Math.min(score, 200), 0);
+        best = Math.max(best, Math.min(430, combined + 40));
       }
     }
     return best;
@@ -472,6 +477,7 @@
     }
 
     const queryForms = normalizeQuery(raw);
+    queryForms.tokens = raw.split(/\s+/).filter(Boolean).flatMap(normalizeQuery);
     const matches = index.map((item, order) => {
       const score = scoreItem(item, queryForms);
       return { item, score, order };
