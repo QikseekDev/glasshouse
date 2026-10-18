@@ -10,7 +10,7 @@
   try { localStorage.removeItem('glasshouse_search_recents'); } catch (e) { /* storage may be disabled */ }
 
   const FAVORITES_KEY = 'glasshouse_search_favorites';
-  const labels = ['button', 'summary', '[role="button"]', 'select', 'label', 'input[placeholder]', '.col-sec', '.apps-grp-h'];
+  const labels = ['button', 'summary', '[role="button"]', 'select', 'label', '.col-sec', '.apps-grp-h'];
   const settingRows = ['.prot-row', '.set', '.cfg-f', '.pv-row'];
   let favorites = readList(FAVORITES_KEY);
   let index = [];
