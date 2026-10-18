@@ -106,6 +106,17 @@
     return (btn ? textFor(btn) : '') || TAB_NAMES[tab] || tab;
   }
 
+  function kindLabel(kind) {
+    const labels = {
+      tab: t('search.kind.tab', 'Tab'),
+      setting: t('search.kind.setting', 'Setting'),
+      action: t('search.kind.action', 'Action'),
+      section: t('search.kind.section', 'Section'),
+      log: t('search.kind.log', 'Log')
+    };
+    return labels[kind] || t('search.kind.result', 'Result');
+  }
+
   function searchableText(el) {
     return (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
   }
@@ -243,7 +254,36 @@
     });
   }
 
-  // 4. Index setting rows (.prot-row, .oled-row, .cfg-f, .pv-row).
+  // 4. Index the currently loaded log rows so global search can find an
+  // actual message, not only the Tools destination. Logs are loaded lazily,
+  // so this naturally stays limited to data already visible in the dashboard.
+  function indexLogLines(seen) {
+    if (!tabAvailable('tools')) return;
+    document.querySelectorAll('#tools-log-entries .log-row').forEach((row, i) => {
+      if (isExcluded(row)) return;
+      const source = row.querySelector('.term-col-src');
+      const process = row.querySelector('.term-col-proc');
+      const message = row.querySelector('.term-col-msg');
+      const title = [source, process, message].map(textFor).filter(Boolean).join(' · ');
+      if (!title) return;
+      const key = 'log:' + (row.dataset.idx || i);
+      if (seen[key]) return;
+      seen[key] = true;
+      index.push({
+        key,
+        title: title.length > 140 ? title.slice(0, 137) + '…' : title,
+        kind: 'log',
+        tab: 'tools',
+        tabTitle: tabLabel('tools'),
+        searchText: searchableText(row),
+        aliases: [],
+        target: row,
+        detail: row.nextElementSibling && row.nextElementSibling.classList.contains('log-detail') ? row.nextElementSibling.closest('details') : null
+      });
+    });
+  }
+
+  // 5. Index setting rows (.prot-row, .oled-row, .cfg-f, .pv-row).
   function indexSettings(seen) {
     const settingSelectors = ['.prot-row', '.oled-row', '.cfg-f', '.pv-row', '.ss-level-row'];
     document.querySelectorAll(settingSelectors.join(',')).forEach(row => {
@@ -300,7 +340,7 @@
     });
   }
 
-  // 5. Index discrete interactive controls (buttons, inputs, selects).
+  // 6. Index discrete interactive controls (buttons, inputs, selects).
   function indexControls(seen) {
     const controlSelectors = [
       '.set button[id]', '.set select[id]', '.set input[id]',
@@ -355,6 +395,7 @@
     indexTabs(seen);
     indexCurated(seen);
     indexSections(seen);
+    indexLogLines(seen);
     indexSettings(seen);
     indexControls(seen);
   }
@@ -433,6 +474,7 @@
   function resultRow(item) {
     const row = document.createElement('div');
     row.className = 'search-result-row';
+    row.dataset.kind = item.kind || 'result';
     row.setAttribute('role', 'group');
 
     const go = document.createElement('button');
@@ -443,12 +485,17 @@
     title.className = 'search-result-title';
     title.textContent = item.title;
 
+    const kind = document.createElement('small');
+    kind.className = 'search-result-kind';
+    kind.textContent = kindLabel(item.kind);
+
     const section = document.createElement('small');
     section.className = 'search-result-section';
     section.textContent = item.tabTitle;
     section.setAttribute('aria-label', t('search.category', 'Category: {category}', { category: item.tabTitle }));
 
     go.appendChild(title);
+    go.appendChild(kind);
     go.appendChild(section);
     go.addEventListener('click', () => openItem(item));
 
