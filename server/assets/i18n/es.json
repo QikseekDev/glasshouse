@@ -12,7 +12,6 @@
  "search.label": {"text": "Buscar ajustes, secciones, aplicaciones y controles", "from": "Search settings, sections, apps and controls"},
  "search.pin": {"text": "Fijar acceso directo", "from": "Pin shortcut"},
  "search.pinned": {"text": "Fijados", "from": "Pinned"},
- "search.recent": {"text": "Recientes", "from": "Recent"},
  "search.results": {"text": "Resultados de búsqueda", "from": "Search results"},
  "search.unpin": {"text": "Quitar acceso directo", "from": "Remove shortcut"},
  "tools.health.abort": {"text": "AbortController", "from": "AbortController"},

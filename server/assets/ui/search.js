@@ -1,17 +1,16 @@
 // Search across the dashboard's existing sections, controls and settings.
-// Pinned and recent destinations stay in this browser; no TV config is written.
+// Pinned destinations stay in this browser; no TV config is written.
 (() => {
   const input = q('global-search-input');
   const results = q('global-search-results');
   const clear = q('global-search-clear');
   if (!input || !results) return;
+  try { localStorage.removeItem('glasshouse_search_recents'); } catch (e) { /* storage may be disabled */ }
 
   const FAVORITES_KEY = 'glasshouse_search_favorites';
-  const RECENTS_KEY = 'glasshouse_search_recents';
   const labels = ['button', 'summary', '[role="button"]', 'select', 'label', 'input[placeholder]', '.col-sec', '.apps-grp-h'];
   const settingRows = ['.prot-row', '.set', '.cfg-f', '.pv-row'];
   let favorites = readList(FAVORITES_KEY);
-  let recents = readList(RECENTS_KEY).slice(0, 3);
   let index = [];
   let appsRequested = false;
 
@@ -84,18 +83,6 @@
       index.push({ key: unique, title, searchText: title, tab, tabTitle: tabLabel(tab), target: el, detail: el.closest('details') });
     });
   }
-  function addRecent(item) {
-    recents = [item.key].concat(recents.filter(key => key !== item.key)).slice(0, 3);
-    saveList(RECENTS_KEY, recents);
-    renderShortcuts();
-  }
-  window.recordDashboardRecent = element => {
-    if (!element) return;
-    buildIndex();
-    const item = index.find(entry => entry.target === element) ||
-      index.find(entry => entry.target.id && entry.target.id === element.id && entry.title === textFor(element));
-    if (item) addRecent(item);
-  };
   function openItem(item) {
     if (!item) return;
     if (typeof showTab === 'function') showTab(item.tab);
@@ -110,7 +97,6 @@
       item.target.classList.add('search-highlight');
       setTimeout(() => item.target.classList.remove('search-highlight'), 2400);
     }, 40);
-    addRecent(item);
     closeSearch();
   }
   function toggleFavorite(item) {
@@ -171,11 +157,11 @@
     const host = q('nav-shortcuts');
     if (!host) return;
     buildIndex(); host.textContent = '';
-    [['Pinned', favorites], ['Recent', recents]].forEach(([heading, keys]) => {
+    [['Pinned', favorites]].forEach(([heading, keys]) => {
       const rows = keys.map(key => index.find(item => item.key === key)).filter(Boolean);
       if (!rows.length) return;
       const title = document.createElement('div'); title.className = 'nav-shortcuts-title';
-      title.textContent = heading === 'Pinned' ? t('search.pinned', 'Pinned') : t('search.recent', 'Recent'); host.appendChild(title);
+      title.textContent = t('search.pinned', 'Pinned'); host.appendChild(title);
       rows.forEach(item => {
         const button = document.createElement('button'); button.type = 'button'; button.className = 'nav-shortcut';
         button.textContent = item.title; button.title = item.title; button.addEventListener('click', () => openItem(item)); host.appendChild(button);
