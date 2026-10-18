@@ -4,6 +4,8 @@
   const input = q('global-search-input');
   const results = q('global-search-results');
   const clear = q('global-search-clear');
+  const backdrop = q('global-search-backdrop');
+  const opener = q('global-search-open');
   if (!input || !results) return;
   try { localStorage.removeItem('glasshouse_search_recents'); } catch (e) { /* storage may be disabled */ }
 
@@ -168,7 +170,18 @@
       });
     });
   }
-  function closeSearch() { results.hidden = true; input.setAttribute('aria-expanded', 'false'); }
+  function openSearch() {
+    if (backdrop) backdrop.hidden = false;
+    if (typeof closeNav === 'function') closeNav();
+    input.focus();
+    input.select();
+    if (input.value.trim()) renderResults(input.value);
+  }
+  function closeSearch() {
+    results.hidden = true;
+    input.setAttribute('aria-expanded', 'false');
+    if (backdrop) backdrop.hidden = true;
+  }
   function openFirstResult() {
     const first = results.querySelector('.search-result');
     if (first) first.click();
@@ -195,12 +208,13 @@
       event.preventDefault(); rows[Math.max(0, Math.min(rows.length - 1, i + (event.key === 'ArrowDown' ? 1 : -1)))].focus();
     } else if (event.key === 'Escape') { closeSearch(); input.focus(); }
   });
-  document.addEventListener('click', event => { if (!event.target.closest('#global-search')) closeSearch(); });
   if (clear) clear.addEventListener('click', clearSearch);
+  if (opener) opener.addEventListener('click', openSearch);
+  if (backdrop) backdrop.addEventListener('click', event => { if (event.target === backdrop) closeSearch(); });
   document.addEventListener('keydown', event => {
     if ((event.key === '/' || (event.key.toLowerCase() === 'k' && (event.ctrlKey || event.metaKey))) &&
         !/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) && !event.target.isContentEditable) {
-      event.preventDefault(); input.focus(); input.select();
+      event.preventDefault(); openSearch();
     }
   });
   renderShortcuts();

@@ -9,6 +9,7 @@
  "common.requestFailed": {"text": "falló la solicitud", "from": "request failed"},
  "search.clear": {"text": "Borrar búsqueda", "from": "Clear search"},
  "search.empty": {"text": "No hay ajustes, secciones, aplicaciones ni controles coincidentes.", "from": "No matching settings, sections, apps or controls."},
+ "search.open": {"text": "Buscar", "from": "Search"},
  "search.label": {"text": "Buscar ajustes, secciones, aplicaciones y controles", "from": "Search settings, sections, apps and controls"},
  "search.pin": {"text": "Fijar acceso directo", "from": "Pin shortcut"},
  "search.pinned": {"text": "Fijados", "from": "Pinned"},
