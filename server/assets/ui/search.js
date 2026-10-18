@@ -57,6 +57,12 @@
   function searchableText(el) {
     return (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
   }
+  function unavailable(el, tab) {
+    const tabButton = document.querySelector(`#tabs [data-tab="${tab}"]`);
+    return tab === 'metrics' || tab === 'apps' ||
+      !tabButton || tabButton.hidden || tabButton.disabled || tabButton.getAttribute('aria-disabled') === 'true' ||
+      el.hidden || el.matches(':disabled') || !!el.querySelector(':disabled');
+  }
   function buildIndex() {
     const seen = {};
     index = [];
@@ -64,7 +70,7 @@
       if (row.hidden || row.closest('#global-search') || row.closest('#sidenav') || row.closest('[hidden]:not(.panel)')) return;
       const title = settingTitle(row);
       const tab = tabFor(row);
-      if (!title || !tab || tab === 'apps') return;
+      if (!title || !tab || unavailable(row, tab)) return;
       const key = (row.id || (tab + ':' + title.toLowerCase())).slice(0, 180);
       const unique = key + ':' + (seen[key] || 0);
       seen[key] = (seen[key] || 0) + 1;
@@ -78,7 +84,7 @@
       const title = textFor(el);
       if (!title || title.length > 80) return;
       const tab = tabFor(el);
-      if (!tab || tab === 'apps') return;
+      if (!tab || unavailable(el, tab)) return;
       const key = (el.id || (tab + ':' + title.toLowerCase())).slice(0, 180);
       const unique = key + ':' + (seen[key] || 0);
       seen[key] = (seen[key] || 0) + 1;
