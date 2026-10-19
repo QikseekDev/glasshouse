@@ -162,7 +162,7 @@
   }
 
   function isExcluded(el) {
-    return !el || el.hidden || el.closest('#global-search') || el.closest('#catalog-box') || el.closest('#apps-installed-list');
+    return !el || el.hidden || el.closest('#global-search') || el.closest('#catalog-box');
   }
 
   function tabAvailable(tab) {
