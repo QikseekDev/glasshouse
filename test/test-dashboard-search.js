@@ -27,7 +27,7 @@ assert(aliasesCode.indexOf("'system logs'") !== -1, 'search includes natural-lan
 assert(aliasesCode.indexOf("'variable refresh rate'") !== -1, 'search includes expanded gaming aliases');
 assert(aliasesCode.indexOf("'home assistant'") !== -1, 'search includes service aliases');
 assert(code.indexOf("tab === 'metrics' || tab === 'apps'") === -1, 'metrics and apps tabs are not blocked from search');
-assert(code.indexOf("closest('#apps-installed-list')") === -1, 'installed apps are not excluded from search');
+assert(code.indexOf("closest('#apps-installed-list')") !== -1, 'installed apps stay excluded from search');
 assert(code.indexOf("nextElementSibling && row.nextElementSibling.classList.contains('log-detail')") === -1, 'log indexing has no dead details lookup');
 
 // On legacy Node (0.10/0.12), browser ES6 cannot be evaluated directly
