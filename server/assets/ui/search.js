@@ -276,8 +276,7 @@
         tabTitle: tabLabel('tools'),
         searchText: searchableText(row),
         aliases: [],
-        target: row,
-        detail: row.nextElementSibling && row.nextElementSibling.classList.contains('log-detail') ? row.nextElementSibling.closest('details') : null
+        target: row
       });
     });
   }
